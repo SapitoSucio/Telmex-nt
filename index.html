@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b0e0d" />
+    <meta
+      name="description"
+      content="Telmex'nt recupera credenciales PPPoE de TELMEX desde respaldos Huawei compatibles, completamente en local."
+    />
+    <title>Telmex'nt | Recupera tus credenciales PPPoE</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./app.js"></script>
+  </head>
+  <body class="app-body">
+    <header class="minimal-header">
+      <a class="brand" href="./" aria-label="Telmex'nt">
+        <span class="brand-mark">T'NT</span>
+        <span>TELMEX'NT</span>
+      </a>
+
+      <div class="header-status" aria-label="Estado del procesamiento">
+        <span class="model-badge">HG8145V5V3 / ONT</span>
+        <!-- <span class="local-badge">
+          <span class="status-dot" aria-hidden="true"></span>
+          OFFLINE / LOCAL
+        </span> -->
+      </div>
+      <span id="status-text" class="sr-only">ejecución local</span>
+    </header>
+
+    <main class="app-shell">
+      <section class="tool" aria-labelledby="title">
+        <div class="tool-intro">
+          <p class="eyebrow">TELMEX TE LA NIEGA.</p>
+          <h1 id="title">Mándalos a CASM</h1>
+          <p class="tool-subtitle">
+            Recupera tu contraseña PPPoE directamente desde el respaldo de configuración de tu módem.
+          </p>
+        </div>
+
+        <div class="tool-card">
+          <div id="toast" class="toast hidden" role="status" aria-live="polite">
+            <span data-icon="check-circle-2" class="icon icon-sm" aria-hidden="true"></span>
+            <span id="toast-message">Copiado al portapapeles</span>
+          </div>
+
+          <div id="upload-view" class="upload-view">
+            <div class="card-top">
+              <span>ARCHIVO CONFIGURACIÓN XML</span>
+              <span class="card-top-secure">
+                <span data-icon="shield-check" class="icon icon-sm" aria-hidden="true"></span>
+                SEGURO
+              </span>
+            </div>
+
+            <input id="file-input" type="file" accept=".xml,application/xml,text/xml" class="sr-only" />
+
+            <div
+              id="dropzone"
+              class="dropzone"
+              tabindex="0"
+              role="button"
+              aria-label="Seleccionar archivo XML de respaldo"
+              aria-describedby="dropzone-help"
+            >
+              <svg
+                class="dropzone-frame"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <rect
+                  class="dropzone-border"
+                  x="1"
+                  y="1"
+                  width="calc(100% - 2px)"
+                  height="calc(100% - 2px)"
+                  rx="12"
+                  fill="none"
+                ></rect>
+              </svg>
+
+              <div class="dropzone-icon" aria-hidden="true">
+                <span data-icon="file-lock-2" class="icon icon-lg"></span>
+              </div>
+              <p class="dropzone-title">Selecciona o arrastra tu respaldo</p>
+              <p id="dropzone-help" class="dropzone-help">Soporta archivos XML de Huawei</p>
+
+              <div class="dropzone-actions">
+                <button id="choose-button" type="button" class="button-primary">
+                  <span data-icon="upload" class="icon icon-sm" aria-hidden="true"></span>
+                  Elegir archivo XML
+                </button>
+                <button id="backup-guide-button" type="button" class="button-secondary guide-button">
+                  <span data-icon="circle-help" class="icon icon-sm" aria-hidden="true"></span>
+                  ¿Cómo obtengo el respaldo?
+                </button>
+              </div>
+            </div>
+
+            <div id="file-selected" class="file-selected hidden" aria-live="polite">
+              <div class="file-selected-name">
+                <span data-icon="file-code-2" class="icon icon-md accent-icon" aria-hidden="true"></span>
+                <span id="file-name" class="truncate-text"></span>
+              </div>
+              <span id="file-size" class="file-size"></span>
+            </div>
+
+            <div id="processing-state" class="processing-state hidden" aria-live="polite">
+              <div class="processing-header">
+                <span id="processing-label">Preparando archivo</span>
+                <span id="processing-step">01 / 04</span>
+              </div>
+              <div class="processing-track" aria-hidden="true"><span></span></div>
+            </div>
+
+            <div id="error-state" class="error-state hidden" role="alert">
+              <span data-icon="triangle-alert" class="icon icon-md error-icon" aria-hidden="true"></span>
+              <div>
+                <p class="error-title">Ocurrió un inconveniente</p>
+                <p id="error-message"></p>
+              </div>
+            </div>
+          </div>
+
+          <section id="results-section" class="results-section hidden" aria-labelledby="results-title">
+            <div class="result-header">
+              <div>
+                <p class="eyebrow">PROCESO COMPLETADO</p>
+                <h2 id="results-title">Credenciales WAN / PPPoE</h2>
+              </div>
+              <button id="reset-button" type="button" class="reset-button">
+                <span data-icon="file-plus-2" class="icon icon-sm" aria-hidden="true"></span>
+                <span>Otro archivo</span>
+              </button>
+            </div>
+
+            <div id="credentials-list" class="credentials-list"></div>
+
+            <div class="result-actions">
+              <div class="action-group">
+                <button id="copy-all-button" type="button" class="button-secondary">
+                  <span data-icon="copy" class="icon icon-sm" aria-hidden="true"></span>
+                  Copiar todo
+                </button>
+                <button id="download-button" type="button" class="button-secondary">
+                  <span data-icon="download" class="icon icon-sm" aria-hidden="true"></span>
+                  Descargar TXT
+                </button>
+              </div>
+              <span id="credentials-count" class="credentials-count"></span>
+            </div>
+          </section>
+
+          
+        </div>
+      </section>
+    </main>
+
+    <div id="backup-guide-modal" class="guide-modal hidden" aria-hidden="true">
+      <button class="guide-backdrop" type="button" data-guide-close aria-label="Cerrar guía"></button>
+      <section
+        class="guide-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="guide-title"
+        aria-describedby="guide-description"
+      >
+        <div class="guide-header">
+          <div>
+            <p class="eyebrow">HUAWEI HG8145V5V3</p>
+            <h2 id="guide-title">Cómo obtener el archivo de respaldo</h2>
+          </div>
+          <button id="guide-close-button" class="icon-button" type="button" data-guide-close aria-label="Cerrar guía">
+            <span data-icon="x" class="icon icon-md" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <p id="guide-description" class="guide-intro">
+          Desde el panel de administración de tu ONT, descarga la copia de configuración que Telmex'nt necesita para buscar tus credenciales PPPoE. Por lo general, la IP del módem es
+          <a href="http://192.168.1.254/" target="_blank" rel="noopener noreferrer">192.168.1.254</a>.
+        </p>
+
+        <ol class="guide-steps">
+          <li><span>1</span><div>Entra a <strong>Herramientas → Respaldo / Restauración</strong>.</div></li>
+          <li><span>2</span><div>Pulsa <strong>Guardar la configuración</strong>.</div></li>
+          <li><span>3</span><div>Pulsa <strong>Descargar el archivo de configuración</strong> y guarda el XML.</div></li>
+          <li><span>4</span><div>Regresa a Telmex'nt y selecciona ese archivo.</div></li>
+        </ol>
+
+        <figure class="guide-figure">
+          <img
+            src="./docs/obtener-respaldo-huawei.png"
+            alt="Panel Huawei HG8145V5V3 mostrando los botones para guardar y descargar el archivo de configuración"
+          />
+        </figure>
+
+
+        <div class="guide-footer">
+          <button type="button" class="button-primary" data-guide-close>Entendido</button>
+        </div>
+      </section>
+    </div>
+
+    <footer class="site-footer">
+      Telmex'nt <span aria-hidden="true">&bull;</span> Recuperación local de credenciales PPPoE.
+    </footer>
+  </body>
+</html>
